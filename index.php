@@ -1,7 +1,7 @@
 <?php
 
-$apiKey = 'AIzaSyChw0CecP11cOYRSnOTlqCbYZonpYSiQx0';
-$channelId = 'UCuVUruvTCCX8GAwV0jRfWdA';
+$apiKey = 'AIzaSyA65uTGVOywhNfSFCO9rqrucyEq8t5-K3s';
+$channelId = 'UCBUMECQziGFpSn85UXl7-vw';
 $resultsNumber = '10';
  
 $requestUrl = 'https://www.googleapis.com/youtube/v3/search?key=' . $apiKey . '&channelId=' . $channelId . '&part=snippet,id&maxResults=' . $resultsNumber .'&order=date';
