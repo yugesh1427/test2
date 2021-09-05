@@ -1,54 +1,52 @@
 <?php
+    $API_key = 'AIzaSyA65uTGVOywhNfSFCO9rqrucyEq8t5-K3s';
+    $channelID = 'UCBUMECQziGFpSn85UXl7-vw';
+    $maxResult = 10;
 
-$apiKey = 'AIzaSyA65uTGVOywhNfSFCO9rqrucyEq8t5-K3s';
-$channelId = 'UCBUMECQziGFpSn85UXl7-vw';
-$resultsNumber = '10';
- 
-$requestUrl = 'https://www.googleapis.com/youtube/v3/search?key=' . $apiKey . '&channelId=' . $channelId . '&part=snippet,id&maxResults=' . $resultsNumber .'&order=date';
+    $apiError = 'Video not Found';
+    try{
+        $apiData = @file_get_contents('https://www.googleapis.com/youtube/v3/search?order=date&part=snippet&channelId='.$channelID.'&maxResults='.$maxResult.'&key='.$API_key.''); 
 
-
-// Try file_get_contents first
-if( function_exists( file_get_contents ) ) {
-    $response = file_get_contents( $requestUrl );
-    $json_response = json_decode( $response, TRUE );
-     
-} else {
-    // No file_get_contents? Use cURL then...
-    if( function_exists( 'curl_version' ) ) {
-        $curl = curl_init();
-        curl_setopt( $curl, CURLOPT_URL, $requestUrl );
-        curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
-        curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, TRUE );
-        $response = curl_exec( $curl );
-        curl_close( $curl );
-        $json_response = json_decode( $response, TRUE );
-         
-    } else {
-        // Unable to get response if both file_get_contents and cURL fail
-        $json_response = NULL;
-    }
-}
- 
-// If there's a JSON response
-if( $json_response ) {
-    $i = 1;
-    echo '<div class="youtube-channel-videos">';
-    foreach( $json_response['items'] as $item ) {
-        $videoTitle = $item['snippet']['title'];
-        $videoID = $item['id']['videoId'];
-        //$videoThumbnail = $item['snippet']['thumbnails']['high']['url'];
- 
-        if( $videoTitle && $videoID ) {
-            echo '<div class="youtube-channel-video-embed vid-' . $videoID . ' video-' . $i++ . '"><iframe width="500" height="300" src="https://www.youtube.com/embed/' . $videoID . '" frameborder="0" allowfullscreen>' . $videoTitle . '</iframe></div>';
-        }
-    }
-    echo '</div><!-- .youtube-channel-videos -->';
- 
-// If there's no response   
-} else {
-    // Display error message
-    echo '<div class="youtube-channel-videos error"><p>No videos are available at this time from the channel specified!</p></div>';
-    }
-}
-
+        if($apiData){ 
+            $videoList = json_decode($apiData); 
+        }else{ 
+            throw new Exception('Invalid API key or channel ID.');
+        }   
+    }catch(Exception $e){
+        $apiError = $e->getMessage();
+    }   
 ?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Get Videos from YouTube Channel using Data API v3 and PHP</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mt-3">Get Videos from YouTube Channel using Data API v3 and PHP</h2>
+        <div class="row">
+            <div class="col-md-12">
+                <?php 
+                    if(!empty($videoList->items)){ 
+                        foreach($videoList->items as $item){ 
+                            if(isset($item->id->videoId)){ 
+                                ?>
+                                <div class="yvideo-box"> 
+                                    <iframe width="280" height="150" src="https://www.youtube.com/embed/<?php echo $item->id->videoId; ?>" frameborder="0" allowfullscreen></iframe> 
+                                    <h4><?php echo $item->snippet->title; ?> </h4> 
+                                </div>
+                                <?php 
+                            } 
+                        } 
+                    }else{ 
+                        echo '<p class="error">'.$apiError.'</p>'; 
+                    }
+                ?>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
