@@ -1,7 +1,7 @@
 <?php
     $API_key = 'AIzaSyA65uTGVOywhNfSFCO9rqrucyEq8t5-K3s';
     $channelID = 'UCBUMECQziGFpSn85UXl7-vw';
-    $maxResult = 10;
+    $maxResult = 1;
 
     $apiError = 'Video not Found';
     try{
